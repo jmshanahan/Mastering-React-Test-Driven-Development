@@ -49,17 +49,35 @@ describe('CustomerForm', () => {
       render(<CustomerForm />);
       expect(field(fieldName).id).toEqual(fieldName);
     });
-  const itSubmitsExistingValue = fieldName =>
+
+  const itSubmitsExistingValue = (fieldName, value) =>
     it('saves existing value when submitted', async () => {
       expect.hasAssertions();
       render(
         <CustomerForm
-          {...{ [fieldName]: 'value' }}
+          {...{ [fieldName]: value }}
           onSubmit={props =>
-            expect(field(props[fieldName])).toEqual('value')
+            expect(props[fieldName]).toEqual(value)
           }
         />
       );
+      await ReactTestUtils.Simulate.submit(form('customer'));
+    });
+
+  const itSubmitsNewValue = (fieldName, value) =>
+    it('saves a new value when submitted', async () => {
+      expect.hasAssertions();
+      render(
+        <CustomerForm
+          {...{ [fieldName]: 'existingValue' }}
+          onSubmit={props =>
+            expect(props[fieldName]).toEqual(value)
+          }
+        />
+      );
+      await ReactTestUtils.Simulate.change(field(fieldName), {
+        target: { value, name: fieldName }
+      });
       await ReactTestUtils.Simulate.submit(form('customer'));
     });
 
@@ -68,21 +86,7 @@ describe('CustomerForm', () => {
     itIncludesTheExistingValue('firstName');
     itRendersALabel('firstName', 'First name');
     itAssignsAnIdThatMatchesTheLabelId('firstName');
-    itSubmitsExistingValue('firstName');
-    it('saves a new value when submitted', async () => {
-      expect.hasAssertions();
-      render(
-        <CustomerForm
-          firstName="Ashley"
-          onSubmit={({ firstName }) =>
-            expect(firstName).toEqual('Jamie')
-          }
-        />
-      );
-      await ReactTestUtils.Simulate.change(field('firstName'), {
-        target: { value: 'Jamie' }
-      });
-      await ReactTestUtils.Simulate.submit(form('customer'));
-    });
+    itSubmitsExistingValue('firstName', 'value');
+    itSubmitsNewValue('firstName', 'anotherFirstName');
   });
 });
