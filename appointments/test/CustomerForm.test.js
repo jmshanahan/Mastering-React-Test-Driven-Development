@@ -106,4 +106,13 @@ describe('CustomerForm', () => {
     itSubmitsExistingValue('phoneNumber', 'value');
     itSubmitsNewValue('phoneNumber', '0874567');
   });
+  describe('submit button', () => {
+    it('has a submit button', () => {
+      render(<CustomerForm />);
+      const submitButton = container.querySelector(
+        'input[type="submit"]'
+      );
+      expect(submitButton).not.toBeNull();
+    });
+  });
 });
